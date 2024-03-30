@@ -4,9 +4,9 @@ import {useEffect, useReducer} from "react";
 import Loader from "./components/Loader";
 import StartScreen from "./components/StartScreen";
 import Question from "./components/Question";
-import question from "./components/Question";
-import NewButton from "./components/NewButton";
+import NextButton from "./components/NextButton";
 import Progress from "./components/Progress";
+import FinishedScreen from "./components/FinishedScreen";
 
 function reducer(state, action) {
     switch (action.type) {
@@ -23,8 +23,9 @@ function reducer(state, action) {
                 answer: action.payload,
                 points: action.payload === question.correctOption ? state.points + question.points : state.points
             };
-        case 'nextQuestion' :
-            return {...state, index: state.index + 1, answer: null};
+        case 'nextQuestion' :return {...state, index: state.index + 1, answer: null};
+        case 'finish' :
+            return {...state, status: 'finished', highscore: state.points > state.highscore ? state.points : state.highscore}
 
         default :
             throw new Error("Action Unknown !");
@@ -38,6 +39,7 @@ const initialState = {
     index: 0,
     answer: null,
     points: 0,
+    highscore: 0
 }
 
 export default function App() {
@@ -66,9 +68,10 @@ export default function App() {
                     <>
                         <Progress index={index} numQuestions={numQuestions} points={points} maxPossiblePoints={macPossiblePoints} answer={answer}/>
                         <Question question={questions[index]} dispatch={dispatch} answer={answer}/>
-                        <NewButton dispatch={dispatch} answer={answer}/>
+                        <NextButton dispatch={dispatch} answer={answer} index={index} numQuestions={numQuestions}/>
                     </>
                 }
+                {status === 'finished' && <FinishedScreen points={points} maxPossiblePoints={macPossiblePoints}/>}
             </Main>
         </div>
     );
